@@ -1,0 +1,55 @@
+values =      c(1e-1,    1e-2,    1e-3,     1e-4,   1e-5   , 1e-6)
+valuesNames = c("0_1", "0_01", "0_001", "0_0001", "0_00001", "0_000001")
+all_train = NULL; all_test = NULL 
+
+for (param in 1:length(values)){#param = 1
+  model = keras_model_sequential()
+  model %>% 
+    layer_dense(units = 30, 
+                activation = "relu", 
+                regularizer_l2(l = values[param]),
+                input_shape = 2) %>% 
+    layer_dense(units = 30, activation = "sigmoid") %>% 
+    #layer_dense(units = 30, activation = "sigmoid") %>% 
+    #layer_dense(units = 20, activation = "relu") %>% 
+    layer_dense(units = 1, activatio = "sigmoid")
+  
+  model %>% compile(loss = "mean_squared_error",
+                    optimizer  = "adam",
+                    metrics = 'mean_absolute_error')
+  set.seed(123)
+  history = model %>% 
+    fit(X_trainData, 
+        y_trainData,
+        batch_size = 1, 
+        verbose = T,
+        epochs = 100,
+        rate = 0.001,
+        validation_split = 0.8,
+        #activity_regularizer = regularizer_l2(l = 0)
+    ) #plot(history)
+# 
+#   jpeg(filename = paste("Results/", valuesNames[param], 
+#                        ".jpeg", sep = ""),
+#       width = 600, height = 400)
+#   p = plot(history)
+#   dev.off()
+
+  plot(history)
+  ggsave(filename = paste("Results/", valuesNames[param], 
+                          ".jpeg", sep = ""),)
+  
+  result_train = model %>% evaluate(X_trainData[1:800,], y_trainData[1:800])
+  all_train[param] = result_train[1]
+  result_test = model %>% evaluate(X_trainData[801:1000,], y_trainData[801:1000])
+  all_test[param] = result_test[1]
+}
+
+train:
+[1] 0.08242638 0.08146480 0.08114478 0.08152024
+[5] 0.08109567 0.08135696 0.08227795
+
+test: 
+[1] 0.08763170 0.08712354 0.08683487 0.08673936
+[5] 0.08630229 0.08653909 0.08704911
+
