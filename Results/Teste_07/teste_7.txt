@@ -37,7 +37,7 @@ head(f_df)
 X_Data = f_df[,-1] %>% as.matrix()
 y_Data = f_df[,1] 
 
-perc = 0.7
+perc = 0.9
 x_trainData = X_Data[1:round(perc*length(X_Data[,1]),0),]
 x_testData = X_Data[(round(perc*length(X_Data[,1]),0)+1):length(X_Data[,1]),]
 
@@ -46,8 +46,8 @@ y_testData = y_Data[(round(perc*length(y_Data),0)+1):length(X_Data[,1])]
 
 
 # grid search values
-values =      c(0, 1e-6, 1e-5, 1e-4, 1e-2, 1e-1)
-valuesNames = c("0", "0_000001", "0_00001", "0_0001", "0_01", "0_1")
+values =      c(0, 1e-6, 1e-4, 1e-2, 1e-1, 1)
+valuesNames = c("0", "0_000001", "0_0001", "0_01", "0_1", 1)
 #all_train = rev(all_train)
 #all_test = rev(all_test)
 #values = rev(values)
@@ -57,7 +57,7 @@ all_train = NULL; all_test = NULL
 for (param in 1:length(values)){#param = 1
   model = keras_model_sequential()
   model %>%
-    layer_dense(units = 3, 
+    layer_dense(units = 10, 
                 activation = "sigmoid", 
                 activity_regularizer = regularizer_l2(l = values[param]),
                 #regularizer_l2(l = values[param]),
@@ -71,9 +71,9 @@ for (param in 1:length(values)){#param = 1
   history = model %>% 
     fit(x_trainData, 
         y_trainData,
-        batch_size = 1, 
+        batch_size = 10, 
         verbose = T,
-        epochs = 200, 
+        epochs = 100,
         rate = 0.05,
         validation_data = c(list(x_testData), list(y_testData))
         #
@@ -89,6 +89,10 @@ for (param in 1:length(values)){#param = 1
   all_test[param] = result_test[1]
 }
 
+#all_train = rev(all_train)
+#all_test = rev(all_test)
+#values = rev(values)
+
 results_df = data.frame("L2" = c(seq(1,6), seq(1,6)),#c(as.numeric(values), as.numeric(values)),
                         "Loss" = c(all_train, all_test),
                         "Phase" = c(rep("Train", 6), rep("Test", 6)))
@@ -101,9 +105,10 @@ results_df = data.frame("L2" = c(seq(1,6), seq(1,6)),#c(as.numeric(values), as.n
 
 plot <- ggplot(results_df, aes(x = L2, y = Loss, fill = Phase))
 plot <- plot + geom_bar(stat = "identity", position = 'dodge',  colour="black")
-plot <- plot + scale_x_continuous(breaks = 1:6, labels=c(values))
-plot <- plot + coord_cartesian(ylim=c(0.12,0.3))
+plot <- plot + scale_x_continuous(breaks = 1:6,
+                                labels=c(values))
+plot <- plot + coord_cartesian(ylim=c(0.2,0.36))
 plot
-ggsave(filename = paste("Results/", "l2_params",
-                        ".jpeg", sep = ""))
+# ggsave(filename = paste("Results/", "l2_params",
+#                         ".jpeg", sep = ""))
 

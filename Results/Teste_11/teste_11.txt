@@ -57,7 +57,7 @@ all_train = NULL; all_test = NULL
 for (param in 1:length(values)){#param = 1
   model = keras_model_sequential()
   model %>%
-    layer_dense(units = 3, 
+    layer_dense(units = 2, 
                 activation = "sigmoid", 
                 activity_regularizer = regularizer_l2(l = values[param]),
                 #regularizer_l2(l = values[param]),
@@ -71,10 +71,10 @@ for (param in 1:length(values)){#param = 1
   history = model %>% 
     fit(x_trainData, 
         y_trainData,
-        batch_size = 1, 
+        batch_size = 10, 
         verbose = T,
-        epochs = 200, 
-        rate = 0.05,
+        epochs = 500, 
+        rate = 0.1,
         validation_data = c(list(x_testData), list(y_testData))
         #
     ) #plot(history)
