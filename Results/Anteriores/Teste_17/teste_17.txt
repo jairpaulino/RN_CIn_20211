@@ -9,7 +9,6 @@ library(pROC)
 library(neuralnet)
 library(dummies)
 library(plotly)
-library(latex2exp)
 
 sigmoid = function(x = 0) {
   s = 1 / (1 + exp(-x))
@@ -18,7 +17,7 @@ sigmoid = function(x = 0) {
 
 #N = sort(rnorm(0, 5, n = 200)); plot(N)
 #N = rnorm(0, 5, n = n); plot(N)
-n = 200
+n = 1000
 x1 = (runif(min = -1, max = 1, n = n)); plot(x1)
 x2 = (runif(min = -1, max = 1, n = n)); plot(x2) 
 
@@ -32,12 +31,7 @@ colnames(f_df) = c("x1", "x2", "f")#"N", "f")
 f_df$x1 = x1
 f_df$x2 = x2
 #f_df$N = N
-f_df$f = f5(x1, x2)
-png("Results/x1_x2_y.png", width = 600, height = 400, res = 100)
-plot(f_df$f, xlab = "índice", 
-     ylab = TeX("y = f(x_1, x_2)+N"),
-     col = "#009999", pch = 19)
-dev.off()
+f_df$f = f5(x1, x2)#, N)
 head(f_df)
 
 X_Data = f_df[,-1] %>% as.matrix()
@@ -71,13 +65,13 @@ for (param in 1:length(values)){#param = 1
     layer_dense(units = 1, activation = "linear")
   
   model %>% compile(loss = "mean_squared_error",
-                    optimizer  = "rmsprop",
+                    optimizer  = "sgd",
                     metrics = 'mean_absolute_error')
   set.seed(123)
   history = model %>% 
     fit(x_trainData, 
         y_trainData,
-        batch_size = 10, 
+        batch_size = 5, 
         verbose = T,
         epochs = 30, 
         rate = 0.01,
@@ -108,8 +102,8 @@ results_df = data.frame("L2" = c(seq(1,7), seq(1,7)),#c(as.numeric(values), as.n
 plot <- ggplot(results_df, aes(x = L2, y = Loss, fill = Phase))
 plot <- plot + geom_bar(stat = "identity", position = 'dodge',  colour="black")
 plot <- plot + scale_x_continuous(breaks = 1:7, labels=c(valuesNames))
-plot <- plot + coord_cartesian(ylim=c(0.295,0.315))
+plot <- plot + coord_cartesian(ylim=c(0.3,0.32))
 plot
 ggsave(filename = paste("Results/", "l2_params_2",
                         ".jpeg", sep = ""))
-write.csv2(results_df, file="Results/param_mse_l2.csv")
+
