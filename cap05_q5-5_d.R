@@ -14,8 +14,7 @@ library(plotly)
 source("auxiliar.R")
 
 f4 = function(x = 0){
-  f = sqrt(2)*sin(x)+sqrt(2)*cos(x)-sqrt(2)*cos(3*x)+sqrt(2)*cos(3*x)
-  return(f)
+  f = sqrt(2) * sin(x) + sqrt(2) * cos(x) - sqrt(2) * sin(3*x) +  sqrt(2) * cos(3*x) 
 }#f4(0)
 
 # Create two vectors of random data between -5 and 5 
@@ -92,7 +91,7 @@ modelMLP_DEEP = h2o.deeplearning(y = "r",
                                  nfolds = 5,
                                  hidden = c(30, 30, 30),
                                  epochs = 50,
-                                 rate = 0.004,
+                                 rate = 0.05,
                                  #l1 = 1.0E-5, #ver depois
                                  #l2 = 0, 
                                  seed = 123,
@@ -105,7 +104,7 @@ modelMLP_DEEP = h2o.deeplearning(y = "r",
 # sampled training data (from model building)
 h2o.performance(modelMLP_DEEP, train = T)
 h2o.performance(modelMLP_DEEP, valid = T)
-h2o.performance(modelMLP_DEEP, newdata = as.h2o(dataNormTest$x1))
+h2o.performance(modelMLP_DEEP, newdata = as.h2o(dataNormTest))
 
 summary(modelMLP_DEEP)
 plot(modelMLP_DEEP)
@@ -122,7 +121,7 @@ plot(dataNormTest$r~forecast_results[[1]], lwd = 1,
      xlab="Aproximação", ylab="Dados")
 abline(a=c(0,0), b=c(1,1), col = 2, lty = 2, lwd =2)
 plot(dataNormTest$r~dataNormTest$x1, type = "l", lwd = 2,
-     ylim = c(-2, 3), ylab = "f(x)", xlab = "x1")
+     ylim = c(-3.5, 4), ylab = "f(x)", xlab = "x1")
 points(dataNormTest$r~dataNormTest$x1, col = 1, pch = 1)
 points(forecast_results[[1]]~dataNormTest$x1, col = 2, pch = 1)
 lines(forecast_results[[1]]~dataNormTest$x1, col = 2)
@@ -133,7 +132,7 @@ legend("top", c("Função", "Aproximação"),
 
 Erro = dataNormTest$r - forecast_results[[1]]
 hist(Erro)
-lillie.test(Erro)
+Slillie.test(Erro)
 
 
 plot(dataNormTest$r~dataNormTest$x1, type = "l", lwd = 2,
