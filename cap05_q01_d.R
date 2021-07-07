@@ -1,4 +1,4 @@
-# Q1 - C ####
+# Q1 - d ####
 # Limpando ambiente
 rm(list = ls()); graphics.off()
 
@@ -19,9 +19,8 @@ f4 = function(x = 0){
 }#f4(0)
 
 # Create two vectors of random data between -5 and 5 
-x1 = sort(runif(min = -0, max = 1, n = 1000)) 
-#x1 = seq(-10, 10, 0.01)
-
+#x1 = sort(runif(min = -5, max = 1, n = 1000)) 
+x1 = seq(-10, 10, 0.01)
 r = NULL
 r_df = data.frame(matrix(ncol = 2, nrow = length(x1)))
 colnames(r_df) = c("x1", "r")
@@ -38,12 +37,15 @@ for (i in 1:length(x1)){
 plot(r_df$r~r_df$x1, type="l", ylab="f(x)", xlab="x")
 
 # Normalizar dados
-dataNorm = as.data.frame(sapply(r_df[,1:2], FUN = normalize_2))
-dataNorm$r = r_df$r #plot.ts(dataNorm$r)
+dataNorm = data.frame(matrix(ncol = 2, nrow = length(r_df$x1)))
+colnames(dataNorm) = c("x1", "r")
+dataNorm$x1 = normalize_2(array = r_df$x1, min = min(r_df$x1), max = max(r_df$x1))
+dataNorm$r = r_df$r #plot.ts(dataNorm$r); class(dataNorm)
+#dataNorm = dataNorm %>% as.matrix()
 
 # Separar em conjunto de validacao (20%)
 set.seed(123)
-sample = sample.split(dataNorm[[1]], SplitRatio = 0.8)
+sample = sample.split(dataNorm$x1, SplitRatio = 0.8)
 dataNormTrainValid = subset(dataNorm, sample == T) #plot.ts(dataNormTrain)
 dataNormTest = subset(dataNorm, sample == F) #plot.ts(dataNormTest)
 sample_2 = sample.split(dataNormTrainValid[[1]], SplitRatio = 0.8)
@@ -119,9 +121,23 @@ forecast_results = as.data.frame(h2o.predict(modelMLP_DEEP,
 plot(dataNormTest$r~forecast_results[[1]], lwd = 1,
      xlab="Aproximação", ylab="Dados")
 abline(a=c(0,0), b=c(1,1), col = 2, lty = 2, lwd =2)
-plot(dataNormTest$r, type = "l", lwd = 2)#, ylim = c(-0.2, 2))
-points(forecast_results[[1]], col = 2)
-lines(forecast_results[[1]], col = 2)
+plot(dataNormTest$r~dataNormTest$x1, type = "l", lwd = 2,
+     ylim = c(-2, 3), ylab = "f(x)", xlab = "x1")
+points(dataNormTest$r~dataNormTest$x1, col = 1, pch = 1)
+points(forecast_results[[1]]~dataNormTest$x1, col = 2, pch = 1)
+lines(forecast_results[[1]]~dataNormTest$x1, col = 2)
+legend("top", c("Função", "Aproximação"),
+       col = c(1,2), lty = c(1,1), lwd = 2, 
+       pch = c(20, 1), horiz = T, cex = 0.8)
+
+
+Erro = dataNormTest$r - forecast_results[[1]]
+hist(Erro)
+lillie.test(Erro)
+
+
+plot(dataNormTest$r~dataNormTest$x1, type = "l", lwd = 2,
+     ylim = c(-2, 3), xlab = "f(x)")
 
 # CAP. 05 - Q1d ####
 

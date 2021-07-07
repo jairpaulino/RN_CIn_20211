@@ -9,10 +9,10 @@ library(pROC)
 library(neuralnet)
 library(dummies)
 library(plotly)
+library(nortest)
 
 # Importar funções auxiliares
 source("auxiliar.R")
-
 
 # Criar função
 f1 = function(x1 = 0, x2 = 0){
@@ -22,10 +22,10 @@ f1 = function(x1 = 0, x2 = 0){
 }#f1(0, 0)
 
 # Gerar valores aleatório entre -5 e 5 
-x1 = sort(runif(min = -5, max = 5, n = 100)) 
-x2 = sort(runif(min = -5, max = 5, n = 100)) 
-#x1 = seq(-5, 5, 0.25)
-#x2 = seq(-5, 5, 0.25)
+#x1 = sort(runif(min = -5, max = 5, n = 100)) 
+#x2 = sort(runif(min = -5, max = 5, n = 100)) 
+x1 = seq(-5, 5, 0.2)
+x2 = seq(-5, 5, 0.2)
 r = matrix(ncol = length(x1), nrow = length(x2))
 r_df = data.frame(matrix(ncol = 3, nrow = length(x1)*length(x2)))
 colnames(r_df) = c("x1", "x2", "r")
@@ -127,6 +127,10 @@ abline(a=c(0,0), b=c(1,1), col = 2, lty = 2, lwd =2)
 plot(dataNormTest$r, type = "l", lwd = 2, ylim = c(-0.2, 2))
 points(forecast_results[[1]], col = 2)
 lines(forecast_results[[1]], col = 2)
+
+Erro = dataNormTest$r - forecast_results[[1]]
+hist(Erro)
+lillie.test(Erro)
 
 
 # CAP. 05 - Q1a ####

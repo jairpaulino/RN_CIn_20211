@@ -20,7 +20,7 @@ sigmoid = function(x = 0) {
 #N = rnorm(0, 5, n = n); plot(N)
 
 f5 = function(x1 = 0, x2 = 0){
-  f = sigmoid(x1+2*x2)+0.5*(x1-x2)^2+0.5*rnorm(0, 0.05, n = 1)
+  f = sigmoid(x1+2*x2)+0.5*(x1-x2)^2+0.5*rnorm(0, 1, n = 1)
   return(f)
 }#f5(0,0,0)
 
